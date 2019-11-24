@@ -8,9 +8,11 @@ namespace ScefHR.Services
 {
     public interface IEmployeeService
     {
-        void Create(Employee newEmployee);
-        IQueryable<Employee> Read(int? id);
-        void Update();
-        void Delete(int id);
+        Task Create(Employee newEmployee);
+        IQueryable Read(string userId);
+        IQueryable Read();
+        IQueryable Read(int id);
+        Task Update(int id, UpdateEmployee value);
+        Task Delete(int id);
     }
 }

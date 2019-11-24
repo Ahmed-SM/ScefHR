@@ -64,20 +64,6 @@ namespace ScefHR.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FormFields",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: true),
-                    Content = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FormFields", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -184,39 +170,21 @@ namespace ScefHR.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ServiceForms",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: true),
-                    Discriminator = table.Column<string>(nullable: false),
-                    EntityId = table.Column<int>(nullable: true),
-                    IssueDate = table.Column<DateTime>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ServiceForms", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ServiceForms_Entities_EntityId",
-                        column: x => x.EntityId,
-                        principalTable: "Entities",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Employees",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     IdentityId = table.Column<string>(nullable: true),
+                    PhoneNumber = table.Column<int>(nullable: false),
                     Gender = table.Column<string>(nullable: true),
+                    Nationality = table.Column<string>(nullable: true),
+                    Address = table.Column<string>(nullable: true),
+                    Birthdate = table.Column<string>(nullable: true),
                     EntityId = table.Column<int>(nullable: true),
                     Position = table.Column<string>(nullable: true),
-                    HireDate = table.Column<DateTime>(nullable: false),
-                    RequestedFormsId = table.Column<int>(nullable: true)
+                    Salary = table.Column<int>(nullable: false),
+                    HireDate = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -233,9 +201,45 @@ namespace ScefHR.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ServiceForms",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: true),
+                    IssueDate = table.Column<DateTime>(nullable: false),
+                    EmployeeId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServiceForms", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Employees_ServiceForms_RequestedFormsId",
-                        column: x => x.RequestedFormsId,
+                        name: "FK_ServiceForms_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FormFields",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: true),
+                    Content = table.Column<string>(nullable: true),
+                    ServiceFormId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FormFields", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FormFields_ServiceForms_ServiceFormId",
+                        column: x => x.ServiceFormId,
                         principalTable: "ServiceForms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -291,14 +295,14 @@ namespace ScefHR.Migrations
                 column: "IdentityId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Employees_RequestedFormsId",
-                table: "Employees",
-                column: "RequestedFormsId");
+                name: "IX_FormFields_ServiceFormId",
+                table: "FormFields",
+                column: "ServiceFormId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ServiceForms_EntityId",
+                name: "IX_ServiceForms_EmployeeId",
                 table: "ServiceForms",
-                column: "EntityId");
+                column: "EmployeeId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -319,22 +323,22 @@ namespace ScefHR.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Employees");
-
-            migrationBuilder.DropTable(
                 name: "FormFields");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
                 name: "ServiceForms");
 
             migrationBuilder.DropTable(
+                name: "Employees");
+
+            migrationBuilder.DropTable(
                 name: "Entities");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }

@@ -8,9 +8,9 @@ namespace ScefHR.Services
 {
     public interface IFormFieldService
     {
-        void Create(FormField formField);
+        Task Create(FormField formField);
         IQueryable<FormField> Read();
-        void Update();
-        void Delete(int id);
+        Task Update();
+        Task Delete(int id);
     }
 }

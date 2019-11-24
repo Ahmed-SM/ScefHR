@@ -9,9 +9,18 @@ namespace ScefHR.Services
 {
     public interface IServiceFormService
     {
-        void Create(ServiceForm serviceForm);
-        IQueryable<ServiceForm> Read();
+        Task Create(ServiceForm serviceForm, string userId);
+        IQueryable Read(string userId);
+        IQueryable Read(string userId, int it);
         Task<bool> Update(int id, ServiceForm serviceForm);
         Task<EntityEntry<ServiceForm>> Delete(int id);
+        IQueryable AdminOnHoldRead(string userId);
+        IQueryable AdminAcceptedRead(string userId);
+        IQueryable OnHoldRead(string userId);
+        IQueryable AcceptedRead(string userId);
+        IQueryable AdminOnHoldRead(int id, string userId);
+        IQueryable AdmiAcceptRead(int id, string userId);
+        Task<bool> AdminOnHoldAccept(string userId, int formId);
+        Task<bool> AdminOnHoldRefuse(string userId, int formId);
     }
 }

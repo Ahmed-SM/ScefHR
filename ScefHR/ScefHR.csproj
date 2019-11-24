@@ -9,6 +9,16 @@
     <Compile Remove="Migrations\20190628223705_Identity.Designer.cs" />
     <Compile Remove="Migrations\20190628232528_Identity.cs" />
     <Compile Remove="Migrations\20190628232528_Identity.Designer.cs" />
+    <Compile Remove="Migrations\20190726170503_employeesAdditional.cs" />
+    <Compile Remove="Migrations\20190726170503_employeesAdditional.Designer.cs" />
+    <Compile Remove="Migrations\20191023175232_Icollection-forms.cs" />
+    <Compile Remove="Migrations\20191023175232_Icollection-forms.Designer.cs" />
+    <Compile Remove="Migrations\20191023175833_Icollection-service.cs" />
+    <Compile Remove="Migrations\20191023175833_Icollection-service.Designer.cs" />
+    <Compile Remove="Migrations\20191024115000_RemoveRequstedForms.cs" />
+    <Compile Remove="Migrations\20191024115000_RemoveRequstedForms.Designer.cs" />
+    <Compile Remove="Migrations\20191031120555_delete-forms-from-entity.cs" />
+    <Compile Remove="Migrations\20191031120555_delete-forms-from-entity.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -15,7 +15,6 @@ namespace ScefHR.Helpers
         public DbSet<Entity> Entities { get; set; }
         public DbSet<FormField> FormFields { get; set; }
         public DbSet<ServiceForm> ServiceForms { get; set; }
-        public DbSet<RequestedForm> RequestedForms { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -25,7 +24,7 @@ namespace ScefHR.Helpers
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
+   
           
         }
 

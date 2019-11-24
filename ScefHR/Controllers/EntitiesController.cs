@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ScefHR.Models;
 using ScefHR.Services;
@@ -25,34 +26,44 @@ namespace ScefHR.Controllers
 
 
         // GET: api/<controller>
-        [HttpGet]
-        public IActionResult Get()
+        [HttpGet("[action]")]
+        [Authorize(Policy = "ApiAdmin")]
+        public IActionResult AdminGet()
         {
-            return Ok(_entityService.Read(null));
+            var userId = User.Claims.First(c => c.Type == "id").Value;
+            var res = _entityService.Read(userId);
+            return Ok(res);
+        }
+        [HttpGet("[action]")]
+        [Authorize(Policy = "ApiSuper")]
+        public IActionResult SGet()
+        {
+            var res = _entityService.SRead();
+            return Ok(res);
         }
 
-        // GET api/<controller>/5
-        [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        [HttpGet]
+        [Authorize(Policy = "ApiAdmin")]
+        public IActionResult Get()
         {
-           
-            return Ok(_entityService.Read(null));
+            var userId = User.Claims.First(c => c.Type == "id").Value;
+            var res = _entityService.Read(userId);
+            return Ok(res);
         }
+
 
         // POST api/<controller>
         [HttpPost]
+        [Authorize(Policy = "ApiSuper")]
         public IActionResult Post([FromBody]string value)
         {
-            AppUser appUser = new AppUser{ FirstName= "Ahmed" , LastName= "Saadawi"};
-            Employee employee = new Employee { Identity = appUser };
-            Entity entity = new Entity { Name = "المؤسسة", NumberOfEmployees= 1 };
-
-            entity.Employees.Add(employee);
-            return Ok(_entityService.Create(entity));
+            _entityService.Create(value);
+            return Ok();
         }
 
-        // PUT api/<controller>/5
+        // PUT api/<cont
         [HttpPut("{id}")]
+        [Authorize(Policy = "ApiSuper")]
         public IActionResult Put(int id, [FromBody]string value)
         {
             _entityService.Update(null);
@@ -61,9 +72,10 @@ namespace ScefHR.Controllers
 
         // DELETE api/<controller>/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "ApiSuper")]
         public IActionResult Delete(int id)
         {
-            _entityService.Delete(1);
+            _entityService.Delete(0);
             return Ok();
         }
     }

@@ -10,8 +10,8 @@ using ScefHR.Helpers;
 namespace ScefHR.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20190716061428_Init")]
-    partial class Init
+    [Migration("20191031163247_employee-in-service")]
+    partial class employeeinservice
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -192,6 +192,10 @@ namespace ScefHR.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("Address");
+
+                    b.Property<string>("Birthdate");
+
                     b.Property<int?>("EntityId");
 
                     b.Property<string>("Gender");
@@ -200,17 +204,19 @@ namespace ScefHR.Migrations
 
                     b.Property<string>("IdentityId");
 
+                    b.Property<string>("Nationality");
+
+                    b.Property<int>("PhoneNumber");
+
                     b.Property<string>("Position");
 
-                    b.Property<int?>("RequestedFormsId");
+                    b.Property<int>("Salary");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EntityId");
 
                     b.HasIndex("IdentityId");
-
-                    b.HasIndex("RequestedFormsId");
 
                     b.ToTable("Employees");
                 });
@@ -240,7 +246,11 @@ namespace ScefHR.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<int?>("ServiceFormId");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ServiceFormId");
 
                     b.ToTable("FormFields");
                 });
@@ -251,31 +261,17 @@ namespace ScefHR.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired();
+                    b.Property<int?>("EmployeeId");
 
-                    b.Property<int?>("EntityId");
+                    b.Property<DateTime>("IssueDate");
 
                     b.Property<string>("Name");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EntityId");
+                    b.HasIndex("EmployeeId");
 
                     b.ToTable("ServiceForms");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("ServiceForm");
-                });
-
-            modelBuilder.Entity("ScefHR.Models.RequestedForm", b =>
-                {
-                    b.HasBaseType("ScefHR.Models.ServiceForm");
-
-                    b.Property<DateTime>("IssueDate");
-
-                    b.ToTable("RequestedForm");
-
-                    b.HasDiscriminator().HasValue("RequestedForm");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -332,17 +328,20 @@ namespace ScefHR.Migrations
                     b.HasOne("ScefHR.Models.AppUser", "Identity")
                         .WithMany()
                         .HasForeignKey("IdentityId");
+                });
 
-                    b.HasOne("ScefHR.Models.ServiceForm", "RequestedForms")
-                        .WithMany()
-                        .HasForeignKey("RequestedFormsId");
+            modelBuilder.Entity("ScefHR.Models.FormField", b =>
+                {
+                    b.HasOne("ScefHR.Models.ServiceForm")
+                        .WithMany("FormFields")
+                        .HasForeignKey("ServiceFormId");
                 });
 
             modelBuilder.Entity("ScefHR.Models.ServiceForm", b =>
                 {
-                    b.HasOne("ScefHR.Models.Entity")
+                    b.HasOne("ScefHR.Models.Employee", "Employee")
                         .WithMany("ServiceForms")
-                        .HasForeignKey("EntityId");
+                        .HasForeignKey("EmployeeId");
                 });
 #pragma warning restore 612, 618
         }

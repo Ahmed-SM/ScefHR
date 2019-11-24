@@ -13,18 +13,17 @@ namespace ScefHR.Services
         public FormFieldService(DataContext context)
         {
             _context = context;
-            _context.SaveChanges();
         }
-        public void Create(FormField formField)
+        public async Task Create(FormField formField)
         {
             _context.FormFields.Add(formField);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(int id)
+        public async Task Delete(int id)
         {
             _context.FormFields.Remove(_context.FormFields.Find(id));
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
         public IQueryable<FormField> Read()
@@ -32,7 +31,7 @@ namespace ScefHR.Services
             return _context.Set<FormField>();
         }
 
-        public void Update()
+        public Task Update()
         {
             throw new NotImplementedException();
         }

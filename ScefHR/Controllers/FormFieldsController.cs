@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,7 @@ namespace ScefHR.Controllers
 
         // GET: api/FormFields
         [HttpGet]
+        [Authorize(Policy = "ApiAdmin")]
         public IEnumerable<FormField> GetFormFields()
         {
             return _context.FormFields;
@@ -30,6 +32,7 @@ namespace ScefHR.Controllers
 
         // GET: api/FormFields/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "ApiAdmin")]
         public async Task<IActionResult> GetFormField([FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -49,6 +52,7 @@ namespace ScefHR.Controllers
 
         // PUT: api/FormFields/5
         [HttpPut("{id}")]
+        [Authorize(Policy = "ApiAdmin")]
         public async Task<IActionResult> PutFormField([FromRoute] int id, [FromBody] FormField formField)
         {
             if (!ModelState.IsValid)
@@ -84,6 +88,7 @@ namespace ScefHR.Controllers
 
         // POST: api/FormFields
         [HttpPost]
+        [Authorize(Policy = "ApiAdmin")]
         public async Task<IActionResult> PostFormField([FromBody] FormField formField)
         {
             if (!ModelState.IsValid)
@@ -99,6 +104,7 @@ namespace ScefHR.Controllers
 
         // DELETE: api/FormFields/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "ApiAdmin")]
         public async Task<IActionResult> DeleteFormField([FromRoute] int id)
         {
             if (!ModelState.IsValid)

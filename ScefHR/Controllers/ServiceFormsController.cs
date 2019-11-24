@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ScefHR.Helpers;
 using ScefHR.Models;
+using ScefHR.Services;
 
 namespace ScefHR.Controllers
 {
@@ -14,113 +17,101 @@ namespace ScefHR.Controllers
     [ApiController]
     public class ServiceFormsController : ControllerBase
     {
-        private readonly DataContext _context;
+   
+        private IServiceFormService _serviceFormService;
+        private IMapper _mapper;
 
-        public ServiceFormsController(DataContext context)
+        public ServiceFormsController(IServiceFormService serviceFormService, IMapper mapper)
         {
-            _context = context;
+            _serviceFormService = serviceFormService;
+            _mapper = mapper;
         }
-
-        // GET: api/ServiceForms
-        [HttpGet]
-        public IEnumerable<ServiceForm> GetServiceForms()
+        [HttpGet("[action]")]
+        [Authorize(Policy = "ApiUser")]
+        //[Authorize(Policy = "ApiAdmin")]
+        public IActionResult GetServiceForms()
         {
-            return _context.ServiceForms;
+            var userId = User.Claims.First(c => c.Type == "id").Value;
+            return Ok(_serviceFormService.Read(userId));
         }
-
-        // GET: api/ServiceForms/5
+        [HttpGet("[action]")]
+        [Authorize(Policy = "ApiAdmin")]
+        public IActionResult OnHoldServiceForms()
+        {
+            var userId = User.Claims.First(c => c.Type == "id").Value;
+            return Ok(_serviceFormService.AdminOnHoldRead(userId));
+        }
+        [HttpGet("[action]")]
+        [Authorize(Policy = "ApiUser")]
+        public IActionResult OnHoldServices()
+        {
+            var userId = User.Claims.First(c => c.Type == "id").Value;
+            return Ok(_serviceFormService.OnHoldRead(userId));
+        }
+        [HttpGet("[action]")]
+        [Authorize(Policy = "ApiAdmin")]
+        public IActionResult AcceptedServiceForms()
+        {
+            var userId = User.Claims.First(c => c.Type == "id").Value;
+            return Ok(_serviceFormService.AdminAcceptedRead(userId));
+        }
+        [HttpGet("[action]")]
+        [Authorize(Policy = "ApiUser")]
+        public IActionResult AcceptedServices()
+        {
+            var userId = User.Claims.First(c => c.Type == "id").Value;
+            return Ok(_serviceFormService.AcceptedRead(userId));
+        }
+        [HttpGet("[action]/{id}")]
+        [Authorize(Policy = "ApiAdmin")]
+        public IActionResult OnHoldServiceForms(int id)
+        {
+            var userId = User.Claims.First(c => c.Type == "id").Value;
+            return Ok(_serviceFormService.AdminOnHoldRead(id, userId));
+        }
+        [HttpGet("[action]/{id}")]//
+        [Authorize(Policy = "ApiAdmin")]
+        public IActionResult AcceptedServiceForms(int id)
+        {
+            var userId = User.Claims.First(c => c.Type == "id").Value;
+            return Ok(_serviceFormService.AdmiAcceptRead(id, userId));
+        }
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetServiceForm([FromRoute] int id)
+        [Authorize(Policy = "ApiAdmin")]
+        public IActionResult GetServiceForms(int id)
+        {
+            var userId = User.Claims.First(c => c.Type == "id").Value;
+            return Ok(_serviceFormService.Read(userId, id));
+        }
+        [HttpPost("[action]")]
+        [Authorize(Policy = "ApiUser")]
+        public IActionResult PostServiceForm([FromBody] ServiceForm serviceForm)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-
-            var serviceForm = await _context.ServiceForms.FindAsync(id);
-
-            if (serviceForm == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(serviceForm);
+            var userId = User.Claims.First(c => c.Type == "id").Value;
+            _serviceFormService.Create(serviceForm, userId);
+            return Ok("Added");
         }
 
-        // PUT: api/ServiceForms/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutServiceForm([FromRoute] int id, [FromBody] ServiceForm serviceForm)
+        [HttpPost("[action]/{id}")]
+        [Authorize(Policy = "ApiAdmin")]
+        public IActionResult OnHoldServicePost(int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (id != serviceForm.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(serviceForm).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ServiceFormExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            var userId = User.Claims.First(c => c.Type == "id").Value;
+            _serviceFormService.AdminOnHoldAccept(userId, id);
+            return Ok("Accepted");
         }
 
-        // POST: api/ServiceForms
-        [HttpPost]
-        public async Task<IActionResult> PostServiceForm([FromBody] ServiceForm serviceForm)
+        [HttpPost("[action]/{id}")]
+        [Authorize(Policy = "ApiAdmin")]
+        public IActionResult OnHoldRefusePost(int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            
-            _context.ServiceForms.Add(serviceForm);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetServiceForm", new { id = serviceForm.Id }, serviceForm);
-        }
-
-        // DELETE: api/ServiceForms/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteServiceForm([FromRoute] int id)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var serviceForm = await _context.ServiceForms.FindAsync(id);
-            if (serviceForm == null)
-            {
-                return NotFound();
-            }
-
-            _context.ServiceForms.Remove(serviceForm);
-            await _context.SaveChangesAsync();
-
-            return Ok(serviceForm);
-        }
-
-        private bool ServiceFormExists(int id)
-        {
-            return _context.ServiceForms.Any(e => e.Id == id);
+            var userId = User.Claims.First(c => c.Type == "id").Value;
+            _serviceFormService.AdminOnHoldRefuse(userId, id);
+            return Ok("Refused");
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using ScefHR.Helpers;
 using ScefHR.Models;
 
@@ -18,32 +19,47 @@ namespace ScefHR.Services
             _context.SaveChanges();
         }
 
-        public string Create(Entity newEntity)
+        public async Task Create(string name)
         {
-            if (string.IsNullOrEmpty(newEntity.Name))
-            {
-                return "Some Fields are empty";  
-            }
+            var exName = _context.Entities.Where(n => n.Name == name).FirstOrDefault();
+            if (exName != null) return;
+            Entity newEntity = new Entity { Name = name };
             _context.Entities.Add(newEntity);
-            _context.SaveChanges();
-            return "New Entity was added";
+            await _context.SaveChangesAsync();
 
         }
 
-        public void Delete(int id)
+        public async Task Delete(int id)
         {
             _context.Entities.Remove(_context.Entities.Find(id));
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public IQueryable<Entity> Read(int? id)
+        public IQueryable Read(string userId)
         {
+            var entityName = _context.Employees.Where(t => t.IdentityId == userId).Select(n =>  n.Entity.Name).First();
+            if (entityName != null)
+            {
+                var res = _context.Entities.Where(e => e.Name == entityName);
+                return res;
+            }
+            return null;
+           
+        }
+        public IQueryable AdminRead()
+        {
+            
             return _context.Set<Entity>();
         }
 
-        public void Update(int? id)
+        public Task Update(int? id)
         {
             throw new NotImplementedException();
+        }
+
+        public IQueryable SRead()
+        {
+            return _context.Set<Entity>();
         }
     }
 }

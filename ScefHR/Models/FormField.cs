@@ -1,4 +1,6 @@
-﻿namespace ScefHR.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ScefHR.Models
 {
     public class FormField
     {

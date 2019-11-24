@@ -8,9 +8,11 @@ namespace ScefHR.Services
 {
     public interface IEntityService
     {
-        string Create(Entity newEntity);
-        IQueryable<Entity> Read(int? id);
-        void Update(int? id);
-        void Delete(int id);
+        Task Create(string name);
+        IQueryable Read(string userId);
+        IQueryable AdminRead();
+        IQueryable SRead();
+        Task Update(int? id);
+        Task Delete(int id);
     }
 }

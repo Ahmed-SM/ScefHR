@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ScefHR.Helpers;
 
 namespace ScefHR.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20191031122309_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -144,11 +146,9 @@ namespace ScefHR.Migrations
 
                     b.Property<bool>("EmailConfirmed");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired();
+                    b.Property<string>("FirstName");
 
-                    b.Property<string>("LastName")
-                        .IsRequired();
+                    b.Property<string>("LastName");
 
                     b.Property<bool>("LockoutEnabled");
 
@@ -200,13 +200,13 @@ namespace ScefHR.Migrations
 
                     b.Property<string>("Gender");
 
-                    b.Property<string>("HireDate");
+                    b.Property<DateTime>("HireDate");
 
                     b.Property<string>("IdentityId");
 
                     b.Property<string>("Nationality");
 
-                    b.Property<string>("PhoneNumber");
+                    b.Property<int>("PhoneNumber");
 
                     b.Property<string>("Position");
 
@@ -266,8 +266,6 @@ namespace ScefHR.Migrations
                     b.Property<DateTime>("IssueDate");
 
                     b.Property<string>("Name");
-
-                    b.Property<int>("Status");
 
                     b.HasKey("Id");
 
@@ -341,7 +339,7 @@ namespace ScefHR.Migrations
 
             modelBuilder.Entity("ScefHR.Models.ServiceForm", b =>
                 {
-                    b.HasOne("ScefHR.Models.Employee", "Employee")
+                    b.HasOne("ScefHR.Models.Employee")
                         .WithMany("ServiceForms")
                         .HasForeignKey("EmployeeId");
                 });
