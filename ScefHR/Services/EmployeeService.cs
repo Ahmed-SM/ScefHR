@@ -5,38 +5,42 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ScefHR.Helpers;
 using ScefHR.Models;
+using ScefHR.Repositories.Interfaces;
 
 namespace ScefHR.Services
 {
     public class EmployeeService : IEmployeeService
     {
-        private DataContext _context;
+        private IEmployeeRepository _employeeRepository;
+        private IEntityRepository _entityRepository;
+        private IUserRepository _userRepository;
 
-        public EmployeeService(DataContext context)
+        public EmployeeService(IEmployeeRepository employeeRepository, IEntityRepository entityRepository, IUserRepository UserRepository)
         {
-            _context = context;
-           // _context.Database.EnsureDeleted();
+            _employeeRepository = employeeRepository;
+            _entityRepository = entityRepository;
+            _userRepository = UserRepository;
+            // _context.Database.EnsureDeleted();
             //_context.Database.EnsureCreated();
-            _context.SaveChanges();
+            //_context.SaveChanges();
         }
         public async Task Create(Employee newEmployee)
         {
-            _context.Employees.Add(newEmployee);
-            await _context.SaveChangesAsync();
+            await _employeeRepository.Create(newEmployee);
+
         }
 
         public async Task Delete(int id)
         {
-            _context.Employees.Remove(_context.Employees.Find(id));
-            await _context.SaveChangesAsync();
+            await _employeeRepository.Delete(id);
         }
 
         public IQueryable Read(string userId)
         {
-            var admin = _context.Employees.Where(t => t.IdentityId == userId).Include(e => e.Entity).FirstOrDefault();
+            var admin = _employeeRepository.ReadByCondition(t => t.IdentityId == userId).Include(e => e.Entity).FirstOrDefault();
             if (admin.Entity != null)
             {
-                return _context.Set<Employee>().Where(e => e.Entity == admin.Entity && admin.Id != e.Id).Select(e => new{
+                return _employeeRepository.ReadByCondition(e => e.Entity == admin.Entity && admin.Id != e.Id).Select(e => new{
                 e.Id,
                 e.Identity.FirstName,
                 e.Identity.LastName,
@@ -55,7 +59,7 @@ namespace ScefHR.Services
         }
         public IQueryable Read()
         {
-                return _context.Set<Employee>().Select(e => new {
+                return _employeeRepository.Read().Select(e => new {
                     e.Id,
                     e.Identity.FirstName,
                     e.Identity.LastName,
@@ -73,7 +77,7 @@ namespace ScefHR.Services
         }
         public IQueryable Read(int id)
         {
-            return _context.Employees.Where(e => e.Id == id).Select(e => new {
+            return _employeeRepository.ReadByCondition(e => e.Id == id).Select(e => new {
                 e.Id,
                 e.Identity.FirstName,
                 e.Identity.LastName,
@@ -91,15 +95,16 @@ namespace ScefHR.Services
 
         public async Task Update(int id, UpdateEmployee value)
         {
-            var result = _context.Employees.Find(id);
+
+            var result = await _employeeRepository.Read(id);
             if (result != null)
             {
-                var user = _context.Users.Find(result.IdentityId);
+                var user = _userRepository.Read(result.IdentityId);
 
                 user.FirstName = value.Firstname;
                 user.LastName = value.Lastname;
                 result.Identity = user;
-                result.Entity = _context.Entities.Where(n => n.Name == value.Branch).FirstOrDefault();
+                result.Entity = _entityRepository.ReadByCondition(n => n.Name == value.Branch).FirstOrDefault();
                 result.Position = value.Position;
                 result.Salary = value.Salary;
                 result.Nationality = value.Nationality;
@@ -109,18 +114,8 @@ namespace ScefHR.Services
                 result.PhoneNumber = value.PhoneNumber;
                 result.HireDate = value.HireDate;
 
-                _context.Employees.Update(result);
+                await _employeeRepository.Update(result);
             }
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception e)
-            {
-
-                throw e;
-            }
-
         }
     }
 }

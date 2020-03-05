@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Converters;
+using ScefHR.Repositories.Interfaces;
+using ScefHR.Repositories;
 
 namespace ScefHR
 {
@@ -97,6 +99,8 @@ namespace ScefHR
             services.AddDbContext<DataContext>(options => options.UseSqlServer("Server = (localdb)\\MSSQLLocalDB; Database = HRScef; Trusted_Connection = True;"));
             
             
+            services.AddScoped<IEntityRepository, EntityRepository>();
+            services.AddScoped<IEmployeeRepository, EmployeeRepository >();
             services.AddScoped<IEmployeeService, EmployeeService>();
             services.AddScoped<IEntityService, EntityService>();
             services.AddScoped<IUserRepository, UserRepository>();

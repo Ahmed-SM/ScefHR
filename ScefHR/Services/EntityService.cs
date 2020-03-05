@@ -5,42 +5,39 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ScefHR.Helpers;
 using ScefHR.Models;
+using ScefHR.Repositories.Interfaces;
 
 namespace ScefHR.Services
 {
     
     public class EntityService : IEntityService
     {
-        private DataContext _context;
+        private IEntityRepository _entityRepository;
+        private IEmployeeRepository _employeeRepository;
 
-        public EntityService(DataContext context)
+        public EntityService(DataContext context, IEntityRepository entityRepository, IEmployeeRepository employeeRepository)
         {
-            _context = context;
-            _context.SaveChanges();
+            _entityRepository = entityRepository;
+            _employeeRepository = employeeRepository;
         }
 
         public async Task Create(string name)
         {
-            var exName = _context.Entities.Where(n => n.Name == name).FirstOrDefault();
-            if (exName != null) return;
-            Entity newEntity = new Entity { Name = name };
-            _context.Entities.Add(newEntity);
-            await _context.SaveChangesAsync();
-
+            Entity entity = new Entity { Name = name };
+            await _entityRepository.Create(entity);
         }
 
-        public async Task Delete(int id)
+        public Task Delete(int id)
         {
-            _context.Entities.Remove(_context.Entities.Find(id));
-            await _context.SaveChangesAsync();
+            throw new NotImplementedException();
         }
 
         public IQueryable Read(string userId)
         {
-            var entityName = _context.Employees.Where(t => t.IdentityId == userId).Select(n =>  n.Entity.Name).First();
+            var entityName = _employeeRepository.ReadByCondition(t => t.IdentityId == userId).Select(n =>  n.Entity.Name).First();
             if (entityName != null)
             {
-                var res = _context.Entities.Where(e => e.Name == entityName);
+                var res = _entityRepository.ReadByCondition(e => e.Name == entityName);
                 return res;
             }
             return null;
@@ -48,18 +45,15 @@ namespace ScefHR.Services
         }
         public IQueryable AdminRead()
         {
-            
-            return _context.Set<Entity>();
+            return _entityRepository.Read();
         }
-
+        public IQueryable SRead()
+        {
+            return _entityRepository.Read();
+        }
         public Task Update(int? id)
         {
             throw new NotImplementedException();
-        }
-
-        public IQueryable SRead()
-        {
-            return _context.Set<Entity>();
         }
     }
 }
